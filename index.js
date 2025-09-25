@@ -24,18 +24,82 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
 
+        const clientCollection = client.db("clientDB").collection("clients")
         const userCollection = client.db("usersDB").collection("users")
+
+        // client Related Api Database
+
+        // insert
+        app.post("/clients", async (req, res) => {
+            const newClient = req.body;
+            const result = await clientCollection.insertOne(newClient)
+            res.send(result)
+        })
+
+        // read
+        app.get('/clients', async (req, res)=>{
+            const result = await clientCollection.find().toArray()
+            res.send(result)
+        })
+
+        // specific id read
+
+        app.get("/clients/:id", async (req, res)=>{
+            const id = req.params.id;
+            const query = {_id:new ObjectId(id)}
+            const result = await clientCollection.findOne(query)
+            res.send(result)
+        })
+
+        // update 
+
+        app.put("/clients/:id", async(req, res)=>{
+            const id = req.params.id;
+            const filter = {_id : new ObjectId(id)}
+             const options = { upsert: true };
+            const newUser = req.body;
+            const UpdatedDoc = {
+                $set : {
+                    newUser,
+                }
+            }
+            const result = await clientCollection.updateOne(filter, UpdatedDoc, options)
+            res.send(result)
+        })
+
+        // delete 
+
+        app.delete("/clients/:id", async (req, res)=>{
+            const id = req.params.id;
+            const query = {_id : new ObjectId(id)}
+            const result = await clientCollection.deleteOne(query)
+            res.send(result)
+        })
+
+
+
+
+
 
         // user  Related api database from client
 
         // insert 
-        
-        app.post("/users", async(req, res)=>{
+
+        app.post("/users", async (req, res) => {
             const newUser = req.body;
             console.log(newUser);
             const result = await userCollection.insertOne(newUser)
             res.send(result)
         })
+
+        // read 
+
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray()
+            res.send(result)
+        })
+
+
 
 
 
@@ -48,9 +112,9 @@ async function run() {
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-    
+
     } finally {
-       
+
     }
 }
 run().catch(console.dir);
