@@ -51,31 +51,7 @@ async function run() {
             res.send(result)
         })
 
-        // update 
-
-        app.put("/clients/:id", async(req, res)=>{
-            const id = req.params.id;
-            const filter = {_id : new ObjectId(id)}
-             const options = { upsert: true };
-            const newUser = req.body;
-            const UpdatedDoc = {
-                $set : {
-                    newUser,
-                }
-            }
-            const result = await clientCollection.updateOne(filter, UpdatedDoc, options)
-            res.send(result)
-        })
-
-        // delete 
-
-        app.delete("/clients/:id", async (req, res)=>{
-            const id = req.params.id;
-            const query = {_id : new ObjectId(id)}
-            const result = await clientCollection.deleteOne(query)
-            res.send(result)
-        })
-
+        
 
 
 
