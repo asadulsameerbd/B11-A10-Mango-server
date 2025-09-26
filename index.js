@@ -31,27 +31,60 @@ async function run() {
 
         // insert
         app.post("/clients", async (req, res) => {
-            const newClient = req.body;
+            const newClient = {
+                ...req.body,
+                userEmail: req.body.userEmail
+            }
             const result = await clientCollection.insertOne(newClient)
             res.send(result)
         })
 
         // read
-        app.get('/clients', async (req, res)=>{
+        app.get('/clients', async (req, res) => {
             const result = await clientCollection.find().toArray()
             res.send(result)
         })
 
         // specific id read
 
-        app.get("/clients/:id", async (req, res)=>{
+        app.get("/clients/:id", async (req, res) => {
             const id = req.params.id;
-            const query = {_id:new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await clientCollection.findOne(query)
             res.send(result)
         })
 
-        
+        // specifiq user email route
+
+        app.get("/myplants/:email", async(req, res)=>{
+            const email = req.params.email
+            const result = await clientCollection.find({userEmail : email}).toArray()
+            res.send(result)
+        })
+
+
+        // update 
+
+        app.put("/clients/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updateData = req.body;
+            const UpdatedDoc = {
+                $set: updateData
+            }
+            const result = await clientCollection.updateOne(filter, UpdatedDoc, options)
+            res.send(result)
+        })
+
+        // delete 
+
+        app.delete("/clients/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await clientCollection.deleteOne(query)
+            res.send(result)
+        })
 
 
 
